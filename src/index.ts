@@ -5,16 +5,15 @@ import {
   Handler,
   CookieOptions,
 } from "express";
-import jwt, { JwtPayload, SignOptions, VerifyErrors } from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
+import type { SignOptions, VerifyErrors } from "jsonwebtoken";
 
 const extractToken = (req: Request, cookieName: string): string | null => {
-  // 1. Check Header
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith("Bearer ")) {
     return authHeader.split(" ")[1];
   }
 
-  // 2. Check Cookie (fallback)
   if (req.cookies && req.cookies[cookieName]) {
     return req.cookies[cookieName];
   }
@@ -22,9 +21,6 @@ const extractToken = (req: Request, cookieName: string): string | null => {
   return null;
 };
 
-/**
- * 1. TOKEN GENERATION
- */
 export interface GenerateJwt {
   payload?: any;
   expiresIn?: SignOptions["expiresIn"];
@@ -35,11 +31,6 @@ export const generateJwt = ({ payload, expiresIn, secret }: GenerateJwt) => {
   return jwt.sign(payload ?? {}, secret, { expiresIn });
 };
 
-/**
- * 2. DYNAMIC REQUEST TYPE
- * K represents the property name (defaulting to 'user')
- * T represents the data shape
- */
 export type TAuthRequest<T = any, K extends string = "user"> = Request & {
   [P in K]?: T;
 };
@@ -71,10 +62,9 @@ export const verifyJwtStrictMW = <T = any, K extends string = "user">(
   secret: string,
   validator: (data: any) => data is T,
   attachKey: K = "user" as K,
-  cookieName: string = "token-tauth", // Added cookieName param
+  cookieName: string = "token-tauth",
 ): Handler => {
   return (req: Request, res: Response, next: NextFunction) => {
-    // Use our helper
     const token = extractToken(req, cookieName);
 
     if (!token) {
@@ -105,8 +95,6 @@ export const setAuthCookie = (
   res: Response,
   token: string,
   cookieName: string = "token-tauth",
-  // 1. Use CookieOptions for better IntelliSense
-  // 2. Default to an empty object
   options: CookieOptions = {},
   env: "development" | "production" = "development",
 ) => {
@@ -114,10 +102,9 @@ export const setAuthCookie = (
     httpOnly: true,
     secure: options.secure ?? process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 1000 * 60 * 60 * 24, // 1 day default
+    maxAge: 1000 * 60 * 60 * 24,
   };
 
-  // The 'options' passed by the user will override the defaults
   res.cookie(cookieName, token, {
     ...defaultOptions,
     ...options,
