@@ -1,6 +1,6 @@
 {
   "name": "@tome888/tauth-express",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Flexible, type-safe JWT auth middleware for Express with dynamic keys and cookie support",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
