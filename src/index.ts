@@ -96,7 +96,6 @@ export const setAuthCookie = (
   token: string,
   cookieName: string = "token-tauth",
   options: CookieOptions = {},
-  env: "development" | "production" = "development",
 ) => {
   const defaultOptions: CookieOptions = {
     httpOnly: true,
@@ -107,6 +106,19 @@ export const setAuthCookie = (
 
   res.cookie(cookieName, token, {
     ...defaultOptions,
+    ...options,
+  });
+};
+
+export const clearAuthCookie = (
+  res: Response,
+  cookieName: string = "token-tauth",
+  options: CookieOptions = {},
+) => {
+  res.clearCookie(cookieName, {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
     ...options,
   });
 };

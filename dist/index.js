@@ -35,7 +35,7 @@ __export(index_exports, {
   verifyJwtStrictMW: () => verifyJwtStrictMW
 });
 module.exports = __toCommonJS(index_exports);
-var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
+var jwt = __toESM(require("jsonwebtoken"));
 var extractToken = (req, cookieName) => {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -47,7 +47,7 @@ var extractToken = (req, cookieName) => {
   return null;
 };
 var generateJwt = ({ payload, expiresIn, secret }) => {
-  return import_jsonwebtoken.default.sign(payload ?? {}, secret, { expiresIn });
+  return jwt.sign(payload ?? {}, secret, { expiresIn });
 };
 var verifyJwtMW = (secret, attachKey = "user", cookieName = "token-tauth") => {
   return (req, res, next) => {
@@ -55,7 +55,7 @@ var verifyJwtMW = (secret, attachKey = "user", cookieName = "token-tauth") => {
     if (!token) {
       return res.status(401).json({ error: "Unauthorized: No Token Provided" });
     }
-    import_jsonwebtoken.default.verify(token, secret, (err, decoded) => {
+    jwt.verify(token, secret, (err, decoded) => {
       if (err) {
         return res.status(401).json({ error: "Unauthorized: Invalid Token" });
       }
@@ -71,7 +71,7 @@ var verifyJwtStrictMW = (secret, validator, attachKey = "user", cookieName = "to
       res.status(401).json({ error: "Unauthorized: No Token Provided" });
       return;
     }
-    import_jsonwebtoken.default.verify(token, secret, (err, decoded) => {
+    jwt.verify(token, secret, (err, decoded) => {
       if (err) {
         res.status(401).json({ error: "Unauthorized: Invalid Token" });
         return;
@@ -93,7 +93,6 @@ var setAuthCookie = (res, token, cookieName = "token-tauth", options = {}, env =
     secure: options.secure ?? process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 1e3 * 60 * 60 * 24
-    // 1 day default
   };
   res.cookie(cookieName, token, {
     ...defaultOptions,

@@ -1,5 +1,5 @@
 // src/index.ts
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 var extractToken = (req, cookieName) => {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -57,7 +57,6 @@ var setAuthCookie = (res, token, cookieName = "token-tauth", options = {}, env =
     secure: options.secure ?? process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 1e3 * 60 * 60 * 24
-    // 1 day default
   };
   res.cookie(cookieName, token, {
     ...defaultOptions,

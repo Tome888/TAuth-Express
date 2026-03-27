@@ -33,7 +33,7 @@ const token = generateJwt({
 });
 ```
 
-2. Set Auth Cookie (Secure)
+### 2. Set Auth Cookie (Secure)
 Sets a secure, HttpOnly cookie to protect against XSS attacks.
 ```ts
 import { setAuthCookie } from '@tome888/auth-express';
@@ -48,7 +48,7 @@ app.post("/login", (req, res) => {
 });
 ```
 
-3. Loose Mode (Quick Setup)
+### 3. Loose Mode (Quick Setup)
 Best for simple apps. Use any custom key (default is user).
 ```ts
 import { verifyJwtMW, TAuthRequest } from '@tome888/auth-express';
@@ -61,7 +61,7 @@ app.get("/profile",
   }
 );
 ```
-4. Strict Mode (Production Standard)
+### 4. Strict Mode (Production Standard)
 Requires a Validator Function to verify the payload structure. This provides the highest level of type safety and security.
 
 ```ts
@@ -84,6 +84,20 @@ app.get("/settings",
     res.json({ plan: req.company?.plan });
   }
 );
+```
+### 5. Logout Support
+Clearing the `HttpOnly` cookie must be done from the server. Use `clearAuthCookie` to securely remove the token from the client's browser.
+
+```typescript
+import { clearAuthCookie } from '@tome888/tauth-express';
+
+app.post("/logout", (req, res) => {
+  clearAuthCookie(res); 
+  // Optionally pass a custom name if you aren't using the default
+  // clearAuthCookie(res, "custom-cookie-name");
+  
+  res.json({ success: true, message: "Logged out" });
+});
 ```
 
 ### API Reference
